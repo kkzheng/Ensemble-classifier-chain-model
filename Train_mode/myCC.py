@@ -7,16 +7,18 @@ from sklearn.metrics import make_scorer
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import StratifiedKFold
 
-def read_file(dirname):
-    proteins = []
-    with open(dirname,'r') as f:
-        while True:
-            line = f.readline()
-            if not line:
-                break
-            line = line.split()[0]
-            proteins.append(line)
-    return proteins
+def load_data(dirname):
+    dictMats = {}
+    dictLabels = {}
+    for i in range(6):
+        matrix = sio.loadmat(dirname + '\\' + 'sample' + str(i) + '.mat')
+        matrix = matrix['feature']
+        lablePos = np.ones((173, 1))
+        labelNeg = np.zeros((252, 1))
+        label = np.vstack([lablePos, labelNeg])
+        dictMats[i] = matrix
+        dictLabels[i] = label
+    return dictMats,dictLabels
 
 def save_model(model,filename):
     import pickle
@@ -99,42 +101,6 @@ def train_model(dictMats, dictLabels):
     print("Train Finish!")
 
 if __name__ == '__main__':
-    dirname = r'./pos_training.txt'
-    proteins = read_file(dirname)
-    dirname = r'./neg_training.txt'
-    proteins_neg = read_file(dirname)
-    proteins.extend(proteins_neg)
-    print(len(proteins))
-    dictMats = {}
-    dictLabels = {}
-    for i in range(len(proteins)):
-        print("------------------------sample "+str(i))
-        fets = protein_exp.fea_exp(proteins[i])
-        DWT_feas = extra_DWT.DWT_fea(fets)
-        PSE_feas = extra_PSE.PSE_fea(fets)
-
-        if i == 0:
-            # dictMats[0] = DWT_feas[0].reshape(1,-1)
-            # dictMats[1] = DWT_feas[1].reshape(1,-1)
-            # dictMats[2] = DWT_feas[2].reshape(1,-1)
-            dictMats[0] = PSE_feas[0].reshape(1,-1)
-            dictMats[1] = PSE_feas[1].reshape(1,-1)
-            dictMats[2] = PSE_feas[2].reshape(1,-1)
-        else:
-            # dictMats[0] = np.vstack([dictMats[0],DWT_feas[0].reshape(1,-1)])
-            # dictMats[1] = np.vstack([dictMats[1],DWT_feas[1].reshape(1,-1)])
-            # dictMats[2] = np.vstack([dictMats[2],DWT_feas[2].reshape(1, -1)])
-            dictMats[0] = np.vstack([dictMats[0],PSE_feas[0].reshape(1, -1)])
-            dictMats[1] = np.vstack([dictMats[1],PSE_feas[1].reshape(1, -1)])
-            dictMats[2] = np.vstack([dictMats[2], PSE_feas[2].reshape(1, -1)])
-
-    for i in range(3):
-        lablePos = np.ones((690, 1))
-        labelNeg = np.zeros((1009, 1))
-        label = np.vstack([lablePos, labelNeg])
-        dictLabels[i] = label
-    for i in range(3):
-        print(dictMats[i].shape)
-        print(dictLabels[i].shape)
-
+    dirname = ""
+    dictMats,ductLabels = load_data(dirname)
     train_model(dictMats,dictLabels)
