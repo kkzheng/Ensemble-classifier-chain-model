@@ -1,5 +1,5 @@
 import numpy as np
-def fifty_seven(matrix,protein):
+def fea_exp(matrix,protein):
     # alfabeto = ['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y']
     alfabeto = ['A','R','N','D','C','Q','E','G','H','I','L','K','M','F','P','S','T','W','Y','V']
     res = np.zeros((57,len(protein)))
